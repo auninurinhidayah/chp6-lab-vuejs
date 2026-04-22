@@ -27,7 +27,8 @@
  		/* Dark theme */
  		.dark { }
  		.dark .card { background: #1E293B; color: #F1F5F9; }
- 		.dark body, body.dark { background: #0F172A; }
+ 		
+ 		body.dark { background: #0F172A; }
  		.dark .bio { color: #94A3B8; }
 
  		.editor {
@@ -65,6 +66,12 @@
 		}
 
 		.btn:hover { background: #33A06F; }
+
+		.btn:disabled { 
+			background: #94a3b8;
+			cursor: not-allowed;
+		}
+
 		.dark .skills li { background: #064E3B; color: #6EE7B7; }
 
 		.muted { color: #94A3B8; font-size: .85rem; margin-top: .75rem; }
@@ -80,6 +87,13 @@
 				<h2>{{ name }}</h2>
 				<p class ="title">{{ title }}</p>
 				<p class ="bio">{{ bio }}</p>
+
+				<ul class="skills">
+ 					<li v-for="(skill, i) in skills" :key="skill">{{ skill }}
+ 					<button @click="removeSkill(i)" title="Remove">&times;</button>
+					</li>
+				</ul>
+
 				<p v-if="skillCount === 0" class="muted">
 					No skills yet — add your first skill to get started.
 				</p>
@@ -89,11 +103,6 @@
  					skill<span v-if="skillCount !== 1">s</span>.
 				</p>
 
-				<ul class="skills">
- 					<li v-for="(skill, i) in skills" :key="skill">{{ skill }}
- 					<button @click="removeSkill(i)" title="Remove">&times;</button>
-					</li>
-				</ul>
 
 			</section>
 
@@ -122,7 +131,13 @@
  						placeholder="e.g. Node.js">
 				</label>
 
-				<button class="btn" @click="addSkill">+ Add skill</button>
+				<label>Change Avatar:
+    				<input type="file" @change="handleFileUpload" accept="image/*">
+				</label>
+
+				<button class="btn" :disabled="!newSkill.trim()" @click="addSkill">
+    				+ Add skill
+				</button>
 			</section>
 		</div>
 	</h1>
@@ -130,7 +145,7 @@
 	<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
 	<script>
- 		const { createApp, ref, computed } = Vue
+ 		const { createApp, ref, computed, watch} = Vue
 
  		createApp({
  			setup() {
@@ -142,6 +157,22 @@
  				const skills = ref(['Vue.js', 'JavaScript', 'HTML & CSS'])
 				const newSkill = ref('')
 				const skillCount = computed(() => skills.value.length)
+
+				watch(darkMode, on=> document.body.classList.toggle('dark', on), {immediate: true})
+
+    			watch(name, (n,o) => console.log(o, "->", n))
+
+    			const saved- JSON.parse(localStorage.getItem('profile') || 'null')
+    				if(saved){
+    					name.value = saved.name ??name.value
+    					bio.value = saved.bio ??bio.value
+    					skills.value = saved.skills ??skills.value
+    				}
+
+    			watch (
+    				()=> ({name: name.value, bio: bio.value, skills: skills.value}),
+    				(profile)=> localStorage.setItem('profile', JSON.stringify(profile)), {deep: true}
+    			)
 
 				function addSkill() {
  					const s = newSkill.value.trim()
