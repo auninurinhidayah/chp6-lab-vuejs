@@ -187,9 +187,16 @@
  					skills.value.splice(index, 1)
 				}
 
+				function onAvatarChange(e){
+					const file = e.target.files?.[0]
+						if (!file) return const reader = new FileReader()
+					reader.onload =() =>{ avatar.value = reader.result }// data: URL
+					reader.readAsDataURL(file)
+				}
+
 				return {
  					name, title, bio, avatar, darkMode,
- 					skills, newSkill, addSkill, removeSkill, skillCount
+ 					skills, newSkill, addSkill, removeSkill, skillCount, onAvatarChange
 				}
  			}
  		}).mount('#app')
